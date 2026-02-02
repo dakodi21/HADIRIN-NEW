@@ -1,1 +1,1165 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hadirin - Absensi Gamifikasi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        :root {
+            --primary-green: #7BA05B;
+            --cream: #F5F1E8;
+            --dark-green: #5C7A45;
+            --light-green: #A8C686;
+            --blue-student: #6BA4D6;
+            --pink-student: #F48FB1;
+            --text-dark: #2D3436;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--cream) 0%, #E8E4D9 100%);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        /* Auth Pages */
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            max-width: 450px;
+            width: 100%;
+        }
+
+        .auth-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-logo h1 {
+            color: var(--primary-green);
+            font-weight: 700;
+            font-size: 2.5rem;
+        }
+
+        .auth-logo p {
+            color: var(--text-dark);
+            opacity: 0.7;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 0.2rem rgba(123, 160, 91, 0.25);
+        }
+
+        .btn-primary {
+            background: var(--primary-green);
+            border: none;
+            padding: 12px;
+            font-weight: 600;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: var(--dark-green);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Main App */
+        .app-header {
+            background: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: var(--cream);
+            border-radius: 10px;
+        }
+
+        .stat-item i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-green);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-dark);
+            opacity: 0.7;
+        }
+
+        /* Quiz Modal */
+        .quiz-container {
+            padding: 20px;
+        }
+
+        .quiz-question {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-dark);
+        }
+
+        .quiz-option {
+            background: var(--cream);
+            border: 2px solid transparent;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quiz-option:hover {
+            border-color: var(--primary-green);
+            transform: translateX(5px);
+        }
+
+        .quiz-option.selected {
+            background: var(--light-green);
+            border-color: var(--primary-green);
+        }
+
+        /* Leaderboard */
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        }
+
+        .rank-badge {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-right: 15px;
+        }
+
+        .rank-1 { background: linear-gradient(135deg, #FFD700, #FFA500); }
+        .rank-2 { background: linear-gradient(135deg, #C0C0C0, #A8A8A8); }
+        .rank-3 { background: linear-gradient(135deg, #CD7F32, #B87333); }
+        .rank-other { background: var(--cream); color: var(--text-dark); }
+
+        /* Progress Bar */
+        .progress {
+            height: 25px;
+            border-radius: 15px;
+            background: var(--cream);
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, var(--primary-green), var(--light-green));
+            border-radius: 15px;
+            font-weight: 600;
+        }
+
+        /* Fire Animation */
+        .fire-animation {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            display: none;
+        }
+
+        .fire-animation.active {
+            display: block;
+            animation: fireZoom 2s ease-out;
+        }
+
+        @keyframes fireZoom {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.5); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+        }
+
+        .fire {
+            font-size: 8rem;
+            filter: drop-shadow(0 0 20px #ff6b00);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 999;
+        }
+
+        .nav-item {
+            text-align: center;
+            cursor: pointer;
+            flex: 1;
+            transition: all 0.3s;
+            color: var(--text-dark);
+            opacity: 0.6;
+        }
+
+        .nav-item.active {
+            color: var(--primary-green);
+            opacity: 1;
+        }
+
+        .nav-item i {
+            font-size: 1.5rem;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .nav-item span {
+            font-size: 0.75rem;
+        }
+
+        /* Badges */
+        .badge-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .badge-item {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        }
+
+        .badge-item.locked {
+            opacity: 0.4;
+            filter: grayscale(1);
+        }
+
+        .badge-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        /* Check-in Button */
+        .checkin-btn {
+            background: linear-gradient(135deg, var(--primary-green), var(--light-green));
+            color: white;
+            border: none;
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            width: 100%;
+            margin: 20px 0;
+            box-shadow: 0 5px 20px rgba(123, 160, 91, 0.3);
+            transition: all 0.3s;
+        }
+
+        .checkin-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(123, 160, 91, 0.4);
+        }
+
+        .checkin-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Meme Feedback */
+        .meme-feedback {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.1rem;
+            color: var(--text-dark);
+        }
+
+        .meme-emoji {
+            font-size: 4rem;
+            margin-bottom: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 576px) {
+            .auth-card {
+                padding: 30px 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Alert */
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+
+        /* Gender Badge */
+        .gender-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .gender-male {
+            background: var(--blue-student);
+        }
+
+        .gender-female {
+            background: var(--pink-student);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Fire Animation -->
+    <div class="fire-animation" id="fireAnimation">
+        <div class="fire">🔥🔥🔥</div>
+        <div class="text-center text-white mt-3" style="font-size: 2rem; font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">
+            STREAK 5 HARI!
+        </div>
+    </div>
+
+    <!-- Login Page -->
+    <div id="loginPage" class="auth-container">
+        <div class="auth-card">
+            <div class="auth-logo">
+                <h1>🎓 Hadirin</h1>
+                <p>Absensi Kece untuk Gen Z</p>
+            </div>
+            <div id="loginAlert"></div>
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" id="loginEmail" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-control" id="loginPassword" required>
+                </div>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="rememberMe">
+                    <label class="form-check-label" for="rememberMe">Remember Me</label>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 mb-3">Login</button>
+                <div class="text-center">
+                    <a href="#" onclick="showRegister()" style="color: var(--primary-green);">Belum punya akun? Daftar yuk!</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Register Page -->
+    <div id="registerPage" class="auth-container hidden">
+        <div class="auth-card">
+            <div class="auth-logo">
+                <h1>🎓 Hadirin</h1>
+                <p>Daftar Sekarang!</p>
+            </div>
+            <div id="registerAlert"></div>
+            <form id="registerForm">
+                <div class="mb-3">
+                    <label class="form-label">Nama Lengkap</label>
+                    <input type="text" class="form-control" id="registerName" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" id="registerEmail" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Jenis Kelamin</label>
+                    <select class="form-select" id="registerGender" required>
+                        <option value="">Pilih...</option>
+                        <option value="male">Laki-laki</option>
+                        <option value="female">Perempuan</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password (min. 6 karakter)</label>
+                    <input type="password" class="form-control" id="registerPassword" required minlength="6">
+                </div>
+                <button type="submit" class="btn btn-primary w-100 mb-3">Daftar</button>
+                <div class="text-center">
+                    <a href="#" onclick="showLogin()" style="color: var(--primary-green);">Sudah punya akun? Login di sini!</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="mainApp" class="hidden">
+        <!-- Header -->
+        <div class="app-header">
+            <div class="container">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar"></div>
+                    <div>
+                        <h5 class="mb-0" id="userName"></h5>
+                        <small class="text-muted" id="userEmail"></small>
+                    </div>
+                    <button class="btn btn-sm btn-outline-danger ms-auto" onclick="logout()">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Home Page -->
+        <div id="homePage" class="container mt-4">
+            <div class="stats-card">
+                <h4>🔥 Streak Kehadiran</h4>
+                <div class="text-center my-4">
+                    <div style="font-size: 4rem;">🔥</div>
+                    <div class="stat-value" id="streakCount">0</div>
+                    <div class="stat-label">Hari Berturut-turut</div>
+                </div>
+                <div class="progress">
+                    <div class="progress-bar" id="streakProgress" style="width: 0%">0%</div>
+                </div>
+                <small class="text-muted d-block mt-2">Target: 5 hari untuk animasi api!</small>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <i class="bi bi-star-fill" style="color: #FFD700;"></i>
+                    <div class="stat-value" id="userLevel">1</div>
+                    <div class="stat-label">Level</div>
+                </div>
+                <div class="stat-item">
+                    <i class="bi bi-lightning-fill" style="color: #FF6B00;"></i>
+                    <div class="stat-value" id="userXP">0</div>
+                    <div class="stat-label">XP</div>
+                </div>
+                <div class="stat-item">
+                    <i class="bi bi-check-circle-fill" style="color: var(--primary-green);"></i>
+                    <div class="stat-value" id="totalAttendance">0</div>
+                    <div class="stat-label">Total Hadir</div>
+                </div>
+                <div class="stat-item">
+                    <i class="bi bi-trophy-fill" style="color: #FF6B00;"></i>
+                    <div class="stat-value" id="badgeCount">0</div>
+                    <div class="stat-label">Badge</div>
+                </div>
+            </div>
+
+            <button class="checkin-btn" id="checkinBtn" onclick="startQuiz()">
+                <i class="bi bi-check-circle-fill me-2"></i>Check-In Sekarang!
+            </button>
+
+            <div id="todayStatus" class="alert hidden"></div>
+        </div>
+
+        <!-- Leaderboard Page -->
+        <div id="leaderboardPage" class="container mt-4 hidden">
+            <h3 class="mb-4">🏆 Leaderboard</h3>
+            <div id="leaderboardList"></div>
+        </div>
+
+        <!-- Profile Page -->
+        <div id="profilePage" class="container mt-4 hidden">
+            <div class="stats-card">
+                <div class="text-center">
+                    <div class="user-avatar mx-auto mb-3" id="profileAvatar" style="width: 100px; height: 100px; font-size: 2.5rem;"></div>
+                    <h4 id="profileName"></h4>
+                    <p class="text-muted" id="profileEmail"></p>
+                    <span class="gender-badge" id="profileGender"></span>
+                </div>
+            </div>
+
+            <div class="stats-card mt-3">
+                <h5>🎯 Progress</h5>
+                <div class="mt-3">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Level <span id="profileLevel">1</span></span>
+                        <span><span id="profileCurrentXP">0</span>/<span id="profileNextXP">100</span> XP</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar" id="profileXPBar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-card mt-3">
+                <h5>🏅 Badge Koleksi</h5>
+                <div class="badge-container" id="badgeContainer">
+                    <!-- Badges will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="showPage('home')">
+                <i class="bi bi-house-fill"></i>
+                <span>Home</span>
+            </div>
+            <div class="nav-item" onclick="showPage('leaderboard')">
+                <i class="bi bi-trophy-fill"></i>
+                <span>Leaderboard</span>
+            </div>
+            <div class="nav-item" onclick="showPage('profile')">
+                <i class="bi bi-person-fill"></i>
+                <span>Profile</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quiz Modal -->
+    <div class="modal fade" id="quizModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header" style="background: var(--primary-green); color: white;">
+                    <h5 class="modal-title">🧠 Quiz Absensi</h5>
+                </div>
+                <div class="modal-body quiz-container">
+                    <div class="quiz-question" id="quizQuestion"></div>
+                    <div id="quizOptions"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="submitQuiz" onclick="submitQuiz()">Submit Jawaban</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result Modal -->
+    <div class="modal fade" id="resultModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body meme-feedback">
+                    <div class="meme-emoji" id="resultEmoji"></div>
+                    <h4 id="resultTitle"></h4>
+                    <p id="resultMessage"></p>
+                    <div id="rewardInfo" class="mt-3"></div>
+                    <button type="button" class="btn btn-primary mt-3" data-bs-dismiss="modal">Oke, Mantap!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Quiz Database
+        const quizDatabase = [
+            {
+                question: "Siapa presiden pertama Indonesia?",
+                options: ["Soekarno", "Soeharto", "Habibie", "Megawati"],
+                correct: 0
+            },
+            {
+                question: "Berapa benua yang ada di dunia?",
+                options: ["5", "6", "7", "8"],
+                correct: 2
+            },
+            {
+                question: "Apa ibu kota Jepang?",
+                options: ["Seoul", "Beijing", "Tokyo", "Bangkok"],
+                correct: 2
+            },
+            {
+                question: "Siapa penemu lampu pijar?",
+                options: ["Thomas Edison", "Albert Einstein", "Newton", "Tesla"],
+                correct: 0
+            },
+            {
+                question: "Planet terbesar di tata surya?",
+                options: ["Mars", "Jupiter", "Saturnus", "Uranus"],
+                correct: 1
+            },
+            {
+                question: "Bahasa resmi Brasil adalah?",
+                options: ["Spanyol", "Portugis", "Inggris", "Prancis"],
+                correct: 1
+            },
+            {
+                question: "Apa singkatan dari UNESCO?",
+                options: ["United Nations Educational, Scientific and Cultural Organization", "Universal Education Society", "United Nations Economic Council", "Universal Network of Education"],
+                correct: 0
+            },
+            {
+                question: "Siapa pelukis Mona Lisa?",
+                options: ["Picasso", "Van Gogh", "Leonardo da Vinci", "Michelangelo"],
+                correct: 2
+            },
+            {
+                question: "Berapa jumlah warna pelangi?",
+                options: ["5", "6", "7", "8"],
+                correct: 2
+            },
+            {
+                question: "Apa mata uang Jepang?",
+                options: ["Won", "Yuan", "Yen", "Ringgit"],
+                correct: 2
+            }
+        ];
+
+        // Badge Definitions
+        const badges = [
+            { id: 'first_checkin', name: 'First Step', icon: '🎯', requirement: 1, description: 'Check-in pertama kali' },
+            { id: 'streak_5', name: 'On Fire', icon: '🔥', requirement: 5, description: 'Streak 5 hari' },
+            { id: 'perfect_week', name: 'Perfect Week', icon: '⭐', requirement: 7, description: 'Hadir 7 hari berturut' },
+            { id: 'attendance_10', name: 'Regular', icon: '💪', requirement: 10, description: 'Total 10x hadir' },
+            { id: 'level_5', name: 'Rising Star', icon: '🌟', requirement: 5, description: 'Mencapai level 5' },
+            { id: 'quiz_master', name: 'Quiz Master', icon: '🧠', requirement: 20, description: 'Jawab 20 quiz benar' }
+        ];
+
+        // Meme Responses
+        const memeResponses = {
+            correct: [
+                { emoji: '🎉', title: 'Mantap Jiwa!', message: 'Otak ente emang beda! Absensi berhasil!' },
+                { emoji: '🚀', title: 'To The Moon!', message: 'Jawaban perfect! Selamat datang di kelas!' },
+                { emoji: '💯', title: '100% Correct!', message: 'Big brain energy detected! Absen sukses!' },
+                { emoji: '⚡', title: 'Speed & Smart!', message: 'Cepet dan bener! Legend banget!' },
+                { emoji: '🎯', title: 'Bullseye!', message: 'Tepat sasaran! Ente emang jago!' }
+            ],
+            wrong: [
+                { emoji: '😅', title: 'Waduh!', message: 'Salah nih... Coba lagi ya!' },
+                { emoji: '🤔', title: 'Think Again!', message: 'Kayaknya perlu baca lagi deh...' },
+                { emoji: '😬', title: 'Ups!', message: 'Next time pasti bisa! Semangat!' },
+                { emoji: '🙃', title: 'Almost!', message: 'Hampir bener kok, coba sekali lagi!' }
+            ]
+        };
+
+        // Global Variables
+        let currentUser = null;
+        let currentQuiz = null;
+        let selectedAnswer = null;
+        let quizModal = null;
+        let resultModal = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            quizModal = new bootstrap.Modal(document.getElementById('quizModal'));
+            resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
+            checkSession();
+            setupEventListeners();
+        });
+
+        // Simple password hashing (base64 encoding - for demo purposes)
+        function hashPassword(password) {
+            return btoa(password);
+        }
+
+        // Setup Event Listeners
+        function setupEventListeners() {
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            document.getElementById('registerForm').addEventListener('submit', handleRegister);
+        }
+
+        // Check Session
+        function checkSession() {
+            const session = localStorage.getItem('hadirin_session');
+            if (session) {
+                const user = JSON.parse(session);
+                loginUser(user);
+            }
+        }
+
+        // Show Register
+        function showRegister() {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('registerPage').classList.remove('hidden');
+        }
+
+        // Show Login
+        function showLogin() {
+            document.getElementById('registerPage').classList.add('hidden');
+            document.getElementById('loginPage').classList.remove('hidden');
+        }
+
+        // Handle Register
+        function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const gender = document.getElementById('registerGender').value;
+            const password = document.getElementById('registerPassword').value;
+
+            // Validate email
+            if (!isValidEmail(email)) {
+                showAlert('registerAlert', 'Email tidak valid!', 'danger');
+                return;
+            }
+
+            // Get existing users
+            let users = JSON.parse(localStorage.getItem('hadirin_users') || '[]');
+
+            // Check if email exists
+            if (users.some(u => u.email === email)) {
+                showAlert('registerAlert', 'Email sudah terdaftar!', 'danger');
+                return;
+            }
+
+            // Create new user
+            const newUser = {
+                id: Date.now(),
+                name: name,
+                email: email,
+                gender: gender,
+                password: hashPassword(password),
+                level: 1,
+                xp: 0,
+                streak: 0,
+                totalAttendance: 0,
+                lastCheckIn: null,
+                attendanceHistory: [],
+                badges: [],
+                quizCorrect: 0,
+                createdAt: new Date().toISOString()
+            };
+
+            users.push(newUser);
+            localStorage.setItem('hadirin_users', JSON.stringify(users));
+
+            showAlert('registerAlert', 'Registrasi berhasil! Silakan login.', 'success');
+            setTimeout(() => {
+                showLogin();
+            }, 1500);
+        }
+
+        // Handle Login
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+
+            const users = JSON.parse(localStorage.getItem('hadirin_users') || '[]');
+            const user = users.find(u => u.email === email && u.password === hashPassword(password));
+
+            if (user) {
+                if (rememberMe) {
+                    localStorage.setItem('hadirin_session', JSON.stringify(user));
+                }
+                loginUser(user);
+            } else {
+                showAlert('loginAlert', 'Email atau password salah!', 'danger');
+            }
+        }
+
+        // Login User
+        function loginUser(user) {
+            currentUser = user;
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('registerPage').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            
+            updateUserInterface();
+            checkTodayAttendance();
+        }
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('hadirin_session');
+            location.reload();
+        }
+
+        // Update User Interface
+        function updateUserInterface() {
+            // Header
+            const avatar = currentUser.name.charAt(0).toUpperCase();
+            const avatarColor = currentUser.gender === 'male' ? 'var(--blue-student)' : 'var(--pink-student)';
+            
+            document.getElementById('userAvatar').textContent = avatar;
+            document.getElementById('userAvatar').style.background = avatarColor;
+            document.getElementById('userName').textContent = currentUser.name;
+            document.getElementById('userEmail').textContent = currentUser.email;
+
+            // Stats
+            document.getElementById('streakCount').textContent = currentUser.streak;
+            document.getElementById('userLevel').textContent = currentUser.level;
+            document.getElementById('userXP').textContent = currentUser.xp;
+            document.getElementById('totalAttendance').textContent = currentUser.totalAttendance;
+            document.getElementById('badgeCount').textContent = currentUser.badges.length;
+
+            // Streak Progress
+            const streakProgress = (currentUser.streak / 5) * 100;
+            document.getElementById('streakProgress').style.width = Math.min(streakProgress, 100) + '%';
+            document.getElementById('streakProgress').textContent = Math.min(streakProgress, 100).toFixed(0) + '%';
+
+            // Profile
+            document.getElementById('profileAvatar').textContent = avatar;
+            document.getElementById('profileAvatar').style.background = avatarColor;
+            document.getElementById('profileName').textContent = currentUser.name;
+            document.getElementById('profileEmail').textContent = currentUser.email;
+            document.getElementById('profileGender').textContent = currentUser.gender === 'male' ? '👨 Mahasiswa' : '👩 Mahasiswi';
+            document.getElementById('profileGender').className = 'gender-badge gender-' + currentUser.gender;
+            document.getElementById('profileLevel').textContent = currentUser.level;
+            
+            const nextLevelXP = currentUser.level * 100;
+            document.getElementById('profileCurrentXP').textContent = currentUser.xp;
+            document.getElementById('profileNextXP').textContent = nextLevelXP;
+            const xpProgress = (currentUser.xp / nextLevelXP) * 100;
+            document.getElementById('profileXPBar').style.width = xpProgress + '%';
+
+            // Badges
+            updateBadges();
+            updateLeaderboard();
+        }
+
+        // Update Badges
+        function updateBadges() {
+            const container = document.getElementById('badgeContainer');
+            container.innerHTML = '';
+
+            badges.forEach(badge => {
+                const earned = currentUser.badges.includes(badge.id);
+                const div = document.createElement('div');
+                div.className = 'badge-item' + (earned ? '' : ' locked');
+                div.innerHTML = `
+                    <div class="badge-icon">${badge.icon}</div>
+                    <div style="font-weight: 600; font-size: 0.9rem;">${badge.name}</div>
+                    <small class="text-muted">${badge.description}</small>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Check Today Attendance
+        function checkTodayAttendance() {
+            const today = new Date().toDateString();
+            const lastCheckIn = currentUser.lastCheckIn ? new Date(currentUser.lastCheckIn).toDateString() : null;
+
+            if (lastCheckIn === today) {
+                document.getElementById('checkinBtn').disabled = true;
+                document.getElementById('checkinBtn').innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Sudah Absen Hari Ini';
+                document.getElementById('todayStatus').classList.remove('hidden');
+                document.getElementById('todayStatus').className = 'alert alert-success';
+                document.getElementById('todayStatus').innerHTML = '✅ Kamu sudah absen hari ini! Streak: ' + currentUser.streak + ' hari 🔥';
+            } else {
+                document.getElementById('checkinBtn').disabled = false;
+                document.getElementById('checkinBtn').innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Check-In Sekarang!';
+                document.getElementById('todayStatus').classList.add('hidden');
+            }
+        }
+
+        // Start Quiz
+        function startQuiz() {
+            currentQuiz = quizDatabase[Math.floor(Math.random() * quizDatabase.length)];
+            selectedAnswer = null;
+
+            document.getElementById('quizQuestion').textContent = currentQuiz.question;
+            
+            const optionsHtml = currentQuiz.options.map((option, index) => 
+                `<div class="quiz-option" onclick="selectAnswer(${index})" data-index="${index}">${option}</div>`
+            ).join('');
+            
+            document.getElementById('quizOptions').innerHTML = optionsHtml;
+            quizModal.show();
+        }
+
+        // Select Answer
+        function selectAnswer(index) {
+            selectedAnswer = index;
+            document.querySelectorAll('.quiz-option').forEach(opt => opt.classList.remove('selected'));
+            document.querySelector(`.quiz-option[data-index="${index}"]`).classList.add('selected');
+        }
+
+        // Submit Quiz
+        function submitQuiz() {
+            if (selectedAnswer === null) {
+                alert('Pilih jawaban dulu ya!');
+                return;
+            }
+
+            quizModal.hide();
+
+            const isCorrect = selectedAnswer === currentQuiz.correct;
+            
+            if (isCorrect) {
+                processCorrectAnswer();
+            } else {
+                processWrongAnswer();
+            }
+        }
+
+        // Process Correct Answer
+        function processCorrectAnswer() {
+            const today = new Date().toDateString();
+            const lastCheckIn = currentUser.lastCheckIn ? new Date(currentUser.lastCheckIn).toDateString() : null;
+            const yesterday = new Date(Date.now() - 86400000).toDateString();
+
+            // Update streak
+            if (lastCheckIn === yesterday) {
+                currentUser.streak++;
+            } else if (lastCheckIn !== today) {
+                currentUser.streak = 1;
+            }
+
+            // Update stats
+            currentUser.totalAttendance++;
+            currentUser.quizCorrect++;
+            currentUser.lastCheckIn = new Date().toISOString();
+            currentUser.attendanceHistory.push({
+                date: new Date().toISOString(),
+                xpEarned: 50
+            });
+
+            // Add XP
+            let xpGained = 50;
+            if (currentUser.streak >= 3) xpGained += 20; // Bonus streak
+            currentUser.xp += xpGained;
+
+            // Level up check
+            const nextLevelXP = currentUser.level * 100;
+            if (currentUser.xp >= nextLevelXP) {
+                currentUser.level++;
+                currentUser.xp = currentUser.xp - nextLevelXP;
+            }
+
+            // Check badges
+            checkAndAwardBadges();
+
+            // Save user
+            saveCurrentUser();
+
+            // Show result
+            const meme = memeResponses.correct[Math.floor(Math.random() * memeResponses.correct.length)];
+            document.getElementById('resultEmoji').textContent = meme.emoji;
+            document.getElementById('resultTitle').textContent = meme.title;
+            document.getElementById('resultMessage').textContent = meme.message;
+            document.getElementById('rewardInfo').innerHTML = `
+                <div class="text-start" style="background: var(--cream); padding: 15px; border-radius: 10px;">
+                    <strong>🎁 Reward:</strong><br>
+                    ⚡ +${xpGained} XP<br>
+                    🔥 Streak: ${currentUser.streak} hari<br>
+                    ${currentUser.streak >= 3 ? '🎉 +20 Bonus Streak!' : ''}
+                </div>
+            `;
+
+            resultModal.show();
+
+            // Fire animation for 5 streak
+            if (currentUser.streak === 5) {
+                setTimeout(() => {
+                    showFireAnimation();
+                }, 1000);
+            }
+
+            // Update UI
+            updateUserInterface();
+            checkTodayAttendance();
+        }
+
+        // Process Wrong Answer
+        function processWrongAnswer() {
+            const meme = memeResponses.wrong[Math.floor(Math.random() * memeResponses.wrong.length)];
+            document.getElementById('resultEmoji').textContent = meme.emoji;
+            document.getElementById('resultTitle').textContent = meme.title;
+            document.getElementById('resultMessage').textContent = meme.message;
+            document.getElementById('rewardInfo').innerHTML = `
+                <p class="text-muted">Jawaban yang benar: <strong>${currentQuiz.options[currentQuiz.correct]}</strong></p>
+            `;
+            resultModal.show();
+        }
+
+        // Check and Award Badges
+        function checkAndAwardBadges() {
+            badges.forEach(badge => {
+                if (!currentUser.badges.includes(badge.id)) {
+                    let shouldAward = false;
+
+                    switch(badge.id) {
+                        case 'first_checkin':
+                            shouldAward = currentUser.totalAttendance >= 1;
+                            break;
+                        case 'streak_5':
+                            shouldAward = currentUser.streak >= 5;
+                            break;
+                        case 'perfect_week':
+                            shouldAward = currentUser.streak >= 7;
+                            break;
+                        case 'attendance_10':
+                            shouldAward = currentUser.totalAttendance >= 10;
+                            break;
+                        case 'level_5':
+                            shouldAward = currentUser.level >= 5;
+                            break;
+                        case 'quiz_master':
+                            shouldAward = currentUser.quizCorrect >= 20;
+                            break;
+                    }
+
+                    if (shouldAward) {
+                        currentUser.badges.push(badge.id);
+                    }
+                }
+            });
+        }
+
+        // Show Fire Animation
+        function showFireAnimation() {
+            const fireEl = document.getElementById('fireAnimation');
+            fireEl.classList.add('active');
+            setTimeout(() => {
+                fireEl.classList.remove('active');
+            }, 2000);
+        }
+
+        // Save Current User
+        function saveCurrentUser() {
+            let users = JSON.parse(localStorage.getItem('hadirin_users') || '[]');
+            const index = users.findIndex(u => u.id === currentUser.id);
+            if (index !== -1) {
+                users[index] = currentUser;
+                localStorage.setItem('hadirin_users', JSON.stringify(users));
+                localStorage.setItem('hadirin_session', JSON.stringify(currentUser));
+            }
+        }
+
+        // Update Leaderboard
+        function updateLeaderboard() {
+            const users = JSON.parse(localStorage.getItem('hadirin_users') || '[]');
+            const sorted = users.sort((a, b) => {
+                if (b.xp !== a.xp) return b.xp - a.xp;
+                return b.totalAttendance - a.totalAttendance;
+            });
+
+            const container = document.getElementById('leaderboardList');
+            container.innerHTML = '';
+
+            sorted.forEach((user, index) => {
+                const rank = index + 1;
+                const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
+                const genderColor = user.gender === 'male' ? 'var(--blue-student)' : 'var(--pink-student)';
+                
+                const div = document.createElement('div');
+                div.className = 'leaderboard-item';
+                div.innerHTML = `
+                    <div class="rank-badge ${rankClass}">${rank}</div>
+                    <div class="user-avatar" style="background: ${genderColor}; width: 50px; height: 50px; font-size: 1.2rem;">
+                        ${user.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <strong>${user.name}</strong>
+                        <div class="small text-muted">
+                            Level ${user.level} • ${user.totalAttendance} hadir • Streak ${user.streak} 🔥
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <div class="stat-value" style="font-size: 1.2rem;">${user.xp}</div>
+                        <div class="stat-label">XP</div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Show Page
+        function showPage(page) {
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            document.getElementById('homePage').classList.add('hidden');
+            document.getElementById('leaderboardPage').classList.add('hidden');
+            document.getElementById('profilePage').classList.add('hidden');
+
+            if (page === 'home') {
+                document.getElementById('homePage').classList.remove('hidden');
+                document.querySelectorAll('.nav-item')[0].classList.add('active');
+            } else if (page === 'leaderboard') {
+                document.getElementById('leaderboardPage').classList.remove('hidden');
+                document.querySelectorAll('.nav-item')[1].classList.add('active');
+                updateLeaderboard();
+            } else if (page === 'profile') {
+                document.getElementById('profilePage').classList.remove('hidden');
+                document.querySelectorAll('.nav-item')[2].classList.add('active');
+            }
+        }
+
+        // Show Alert
+        function showAlert(containerId, message, type) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = `<div class="alert alert-${type}" role="alert">${message}</div>`;
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 3000);
+        }
+
+        // Validate Email
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+    </script>
+</body>
+</html>
